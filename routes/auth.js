@@ -20,26 +20,30 @@ router.get('/login', async(req,res)=>{
     const {login,password} = req.body;
     //validating login and password
     const {error} = loginValidation(req.body);
-    if(error) res.status(400).send(jsendError(error,error.details[0].message));
+    if(error) return res
+                        .status(400)
+                        .send(jsendError(error,error.details[0].message));
 
     try{    
         //check user 
         const user =  await User.findOne({login:login});
-        if(!user) res.status(400).send(jsendError(req.body,"somthing is wrong."));
+        if(!user) return res
+                            .status(400)
+                            .send(jsendError(req.body,"somthing is wrong."));
         // if we have it generate token and save to header
         if(await bcrypt.compare(password, user.password)){
-            res
-                .header(config.get('tokenPath'), user.genereteAuthToken())
-                .send(jsendSuccess(user,"wellcome..."));
+            return res
+                    .header(config.get('tokenPath'), user.genereteAuthToken())
+                    .send(jsendSuccess(user,"wellcome..."));
         } else{
-            res
-                .status(400)
-                .send(jsendError("","somthing is wrong"));
+            return res
+                    .status(400)
+                    .send(jsendError("","somthing is wrong"));
         } 
     }catch(e){
-        res
-            .status(500)
-            .send(jsendError(e, e.message));
+        return res
+                .status(500)
+                .send(jsendError(e, e.message));
     }
 
 });
