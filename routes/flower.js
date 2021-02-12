@@ -84,7 +84,7 @@ router.get('/:id',auth, async(req,res)=>{
     const {id} = req.params;
     try{
         // do we have it in db ?
-        const flower = Flower.findById(id);
+        const flower = await Flower.findById(id);
         if(!flower) return res.status(404).send(jsendError(id, "not found."));
         // return flower 
         return res.send(jsendSuccess(flower));
