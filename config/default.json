@@ -1,0 +1,11 @@
+{
+    "name":"My express App",
+    "mail":{
+        "server":"def-mail-server"
+        
+    },
+    "tokenPath":"x-auth-token",
+    "mongo":{
+        "db_name":"mongodb://localhost/sunflower"
+    }
+}
