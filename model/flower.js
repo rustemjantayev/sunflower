@@ -27,7 +27,7 @@ const flower = mongoose.Schema({
     }
 });
 
-const Flower = mongoose.model('flower', flower);
+const Flower = mongoose.model('Flower', flower);
 
 function validateFlower(flower){
     const schema = Joi.object({

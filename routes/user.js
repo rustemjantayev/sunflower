@@ -21,7 +21,7 @@ router.get('/me',auth ,async (req,res)=>{
 // router.get('/logout', (req,res)=>{
 //     res.header(config.get('tokenPath'), "")
 // });
-
+//create new user
 router.post('/', async (req, res)=>{
     const {password,repeat_password,login} = req.body;
     const {body} = req;
@@ -47,6 +47,15 @@ router.post('/', async (req, res)=>{
     }catch(err){
             res.status(500).send(jsendError(err ,err.message));
     }
+});
+
+// add flower to current user
+router.post('/flower', auth, async(req, res)=>{
+
+});
+// delete flower from current user
+router.delete('/flower/:id', auth, async(req, res)=>{
+
 });
 
 module.exports = router;

@@ -1,13 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const {Sms, smsModelValidation} = require('../model/sms');
+const Joi = require('joi');
 const _ = require('lodash');
 const auth = require('../midleware/auth');
 const {sendSms} = require('../midleware/sendsms');
 const bcrypt = require('bcrypt');
 const {jsendError, jsendSuccess} = require('../thirdparty/jsend');
 
-router.get('/validation', auth, async (req,res)=>{
+
+function phoneValidation(phone){
+    const schema = Joi.object({
+        phone: Joi.number().required()
+    });
+    return schema.validate(phone);
+}
+
+router.post('/validation', auth, async (req,res)=>{
     const {smsCode} = req.body;
     if(!smsCode) res.status(500).send(jsendError("","`smsCode` is required"));
     try{
@@ -46,12 +55,17 @@ router.get('/validation', auth, async (req,res)=>{
 });
 
 router.post('/confirnmation',auth ,async (req,res)=>{
+    console.log(req.body)
+    const {phone} = req.body;
     const code = _.random(9999).toString();
     const sms = {
         userid:req.user._id,
         code: code,
         action: "conf"
     }
+    //validate phonenumber
+    const {error:e} = phoneValidation(req.body);
+    if(e) return res.status(500).send(jsendError("", e.details[0].message));
     // sms code encription 
     try{
         const salt = await bcrypt.genSalt(1);
@@ -62,7 +76,7 @@ router.post('/confirnmation',auth ,async (req,res)=>{
     }catch(e){
         return res.status(500).send(jsendError("", e.message));
     }
-
+  
     const {error} = smsModelValidation(sms);
     if(error) return res.status(500).send(jsendError(error, error.details[0].message));
   
@@ -70,8 +84,8 @@ router.post('/confirnmation',auth ,async (req,res)=>{
     try{
         await user.save();
         //TODO add param to user phone number required
-        sendSms('16194140093',code);
-        return res.send(jsendSuccess(code));
+        //sendSms(phone,code);
+        return res.send(jsendSuccess({phone:phone},""));
     }catch(e){
         res.status(500).send(jsendError(e.message));
     }

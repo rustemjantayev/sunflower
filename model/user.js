@@ -13,7 +13,10 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    flowers:[],
+    flowers:[{
+        type: mongoose.Schema.Types.ObjectId,   
+        ref: 'Flower'
+    }],
     admin:{
         type: Boolean,
         default: false
@@ -24,7 +27,7 @@ userSchema.methods.genereteAuthToken = function(){
     return jwt.sign({_id: this._id, username: this.login, admin: this.admin},  config.get('jwtPrivateKey'));
 }
 
-const User = mongoose.model('user', userSchema);
+const User = mongoose.model('User', userSchema);
 
 function userValidation(user){
     const schema = Joi.object({
