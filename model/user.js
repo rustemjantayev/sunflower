@@ -14,8 +14,10 @@ const userSchema = mongoose.Schema({
         required: true
     },
     flowers:[{
-        type: mongoose.Schema.Types.ObjectId,   
-        ref: 'Flower'
+        id:{
+            type: mongoose.Schema.Types.ObjectId,   
+            ref: 'Flower'
+        }
     }],
     admin:{
         type: Boolean,

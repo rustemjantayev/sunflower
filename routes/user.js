@@ -5,6 +5,10 @@ const bcrypt = require('bcrypt');
 const config = require('config');
 const auth = require('../midleware/auth');
 const {jsendSuccess,jsendError} = require('../thirdparty/jsend');
+const {objectIdValidation} = require('../thirdparty/joi');
+const {Flower} = require('../model/flower.js');
+
+
 // get current user
 router.get('/me',auth ,async (req,res)=>{
     try{
@@ -51,10 +55,29 @@ router.post('/', async (req, res)=>{
 
 // add flower to current user
 router.post('/flower', auth, async(req, res)=>{
+    const {_id:flowerId} = req.body;
+    const {_id:userId} = req.user;
+    console.log(req.user);
+     const {error} = objectIdValidation(req.body);
+     if(error) return res.status(500).send(jsendError(error, error.details[0].message));
 
+    try{
+        //find user
+        const user = await User.findById(userId).populate('flowerss');
+        //make sure user dont have this flower
+        const fwrs = user.flowers.filter(f=> f._id.toString() === req.body._id);
+        if(fwrs.length > 0) return res.status(500).send(jsendError("","We alredy have thisi flower"));
+        //check same flower
+        user.flowers.push(req.body);
+        await user.save(); 
+       
+        return res.send(user);
+    }catch(e){
+        return res.status(500).send(jsendError(e, e.message));
+    }
 });
 // delete flower from current user
-router.delete('/flower/:id', auth, async(req, res)=>{
+router.delete('/flower', auth, async(req, res)=>{
 
 });
 
